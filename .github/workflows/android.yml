@@ -16,26 +16,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Java (Android requirement)
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.6'
           channel: 'stable'
+          cache: true   # ⚡ speeds up builds
 
+      # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
+      # Analyze (don’t fail on minor issues)
       - name: Analyze project
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
+      # Run tests
       - name: Run tests
         run: flutter test
 
+      # Build APK
       - name: Build APK
         run: flutter build apk --release
+
+      # ✅ NEW: Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
